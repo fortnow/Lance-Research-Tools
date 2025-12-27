@@ -1,0 +1,27 @@
+javascript:(function(){
+  /* 1. Try to find DOI in URL */
+  var doiRegex = /10\.\d{4,9}\/[-._;()/:a-z0-9]+/gi;
+  var match = window.location.href.match(doiRegex);
+
+  /* 2. If not in URL, check metadata tags (common in journals) */
+  if (!match) {
+    var meta = document.querySelector('meta[name*="doi"], meta[name*="DOI"]');
+    if (meta && meta.content) {
+      match = meta.content.match(doiRegex);
+    }
+  }
+
+  /* 3. If still not found, search the body text */
+  if (!match) {
+    match = document.body.innerText.match(doiRegex);
+  }
+
+  if (match) {
+    /* Use the first match found */
+    var doi = match[0].replace(/(\.)$/, ''); 
+    var scholarUrl = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(doi);
+    window.open(scholarUrl, '_blank');
+  } else {
+    alert('Could not find a DOI on this page.');
+  }
+})();
